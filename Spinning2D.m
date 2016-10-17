@@ -12,12 +12,12 @@ params.k13 = 10; %Newtons/meter
 % params.d12 = 0.1; %Newtons/meter
 % params.d13 = 0.1; %Newtons/meter
 
-params.kp1 = 0.1;
+params.kp1 = 0.01;
 params.wtari = 0.1;
-params.wtarf = 0.2;
-params.ti = tf/1;
-params.tf = tf*1/1;
-params.kp2 = -0.001;
+params.wtarf = 0.15;
+params.ti = tf/10;
+params.tf = tf*3/10;
+params.kp2 = 0.000;
 
 %x=[rx1 ry1 vx1 vy1 th1 w1, rx2 ry2 vx2 vy2 th2 w2, rx3 ry3 vx3 vy3 th3 w3]
 x_i = [0 0 0 0 0 0, 0.9 0 0 0.1 0 0, -0.9 0 0 -0.1 0 0]';
@@ -32,6 +32,8 @@ disp(['Sim Completed in: ',num2str(toc),' seconds']);
 end
 
 function xdot = RHS(t,x,params)
+
+xdot = x*0;
 
 an = anchorPos(x,params);
 d12 = sqrt((an.x12-an.x2)^2 + (an.y12-an.y2)^2);
