@@ -14,7 +14,7 @@ params.k13 = 10; %Newtons/meter
 
 params.kp1 = 0.01;
 params.wtari = 0.1;
-params.wtarf = 0.15;
+params.wtarf = 0.2;
 params.ti = tf/10;
 params.tf = tf*3/10;
 params.kp2 = 0.000;
@@ -23,7 +23,7 @@ params.kp2 = 0.000;
 x_i = [0 0 0 0 0 0, 0.9 0 0 0.1 0 0, -0.9 0 0 -0.1 0 0]';
 
 % tf = 10;
-tspan=linspace(0,tf,tf*1000);
+tspan=linspace(0,tf,tf*500);
 opts = odeset('RelTol',3e-14,'AbsTol',1e-18);
 [tarray, zarr] = ode45(@RHS, tspan, x_i, opts, params);
 

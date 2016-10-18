@@ -22,10 +22,14 @@ oV2 = s2.Vertices;
 oV3 = s3.Vertices;
 
 currTime = 0;
-
+exp2movie = 1;
+if exp2movie
+    vwr = VideoWriter('2D Animation.avi');
+    open(vwr);
+end
 title(['Three Body Tethered Simulation, Xspeed=',num2str(timeX)]);
-
-tic; 
+ind = 1;
+tic;
 while currTime < t(end)
     th1 = interp1(t,z(:,5),currTime*timeX);
     rotation1 = [cos(th1),-sin(th1); sin(th1),cos(th1)];
@@ -43,8 +47,8 @@ while currTime < t(end)
     
     margin = p.L12*1.1;
     
-%     [-params.L12+rx1-margin params.L12+rx1+margin ...
-%         -params.L12+ry1-margin params.L12+ry1+margin]
+    %     [-params.L12+rx1-margin params.L12+rx1+margin ...
+    %         -params.L12+ry1-margin params.L12+ry1+margin]
     
     axis([-p.L12+rx1-margin p.L12+rx1+margin ...
         -p.L12+ry1-margin p.L12+ry1+margin])
@@ -58,8 +62,13 @@ while currTime < t(end)
     s3.Vertices = [rot3(:,1) + rx3 , rot3(:,2) + ry3];
     
     drawnow;
-    
     currTime = toc;
+    
+    if exp2movie
+        writeVideo(vwr,getframe(gcf));        
+    end
 end
+
+
 
 end
