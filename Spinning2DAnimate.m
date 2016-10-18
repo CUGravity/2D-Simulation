@@ -24,7 +24,7 @@ oV3 = s3.Vertices;
 currTime = 0;
 exp2movie = 1;
 if exp2movie
-    vwr = VideoWriter('2D Animation.avi');
+    vwr = VideoWriter('2D Animation 2.avi');
     open(vwr);
 end
 title(['Three Body Tethered Simulation, Xspeed=',num2str(timeX)]);

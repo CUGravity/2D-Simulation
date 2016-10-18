@@ -14,16 +14,24 @@ params.k13 = 10; %Newtons/meter
 
 params.kp1 = 0.01;
 params.wtari = 0.1;
-params.wtarf = 0.2;
-params.ti = tf/10;
-params.tf = tf*3/10;
+params.wtarf = 0.15;
+params.ti = tf*1/8;
+params.tf = tf*2/4;
 params.kp2 = 0.000;
 
 %x=[rx1 ry1 vx1 vy1 th1 w1, rx2 ry2 vx2 vy2 th2 w2, rx3 ry3 vx3 vy3 th3 w3]
 x_i = [0 0 0 0 0 0, 0.9 0 0 0.1 0 0, -0.9 0 0 -0.1 0 0]';
 
+% % Force balance stable
+% ropt = 1.05;
+% wopt = sqrt(-params.k12*(params.L12 - ropt)/(params.m*ropt));
+% vopt = wopt/ropt;
+% params.wtari = wopt;
+% % x=[rx1 ry1 vx1 vy1 th1 w1, rx2 ry2 vx2 vy2 th2 w2, rx3 ry3 vx3 vy3 th3 w3]
+% x_i = [0 0 0 0 0 wopt, ropt 0 0 vopt 0 wopt, -ropt 0 0 -vopt 0 wopt]';
+
 % tf = 10;
-tspan=linspace(0,tf,tf*500);
+tspan=linspace(0,tf,tf*1000);
 opts = odeset('RelTol',3e-14,'AbsTol',1e-18);
 [tarray, zarr] = ode45(@RHS, tspan, x_i, opts, params);
 
@@ -84,7 +92,6 @@ vx3 = x(15); vy3 = x(16);
 w1 = x(6); w2 = x(12); w3 = x(18);
 
 a1 = (F_12_ll+F_13_ll)/params.m;
-% a1 = 0*a1;
 a2 = F_2_ll/params.m;
 a3 = F_3_ll/params.m;
 
@@ -116,6 +123,11 @@ Torque3 = params.kp2*(thTarget3-x(17));
 wdot1 = (M_12(3)+M_13(3))/params.I + TorqueC/params.I;
 wdot2 = M_2(3)/params.I + Torque2/params.I;
 wdot3 = M_3(3)/params.I + Torque3/params.I;
+
+% % Mirror
+% wdot3 = wdot2;
+% a3 = -a2;
+% a1 = 0*a1;
 
 xdot = [vx1 vy1 a1(1) a1(2) w1 wdot1, ...
     vx2 vy2 a2(1) a2(2) w2 wdot2, vx3 vy3 a3(1) a3(2) w3 wdot3]';

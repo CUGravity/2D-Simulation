@@ -25,7 +25,7 @@ plot(t,fil12,t,fil18);
 title('Filtered of rotation rates, Sides');
 
 figure;
-n = 50000;
+n = 500;
 helper = ones(1,n);
 fil6 = filter( helper , 1 , z(:,6)/n);
 plot(t,fil6);
