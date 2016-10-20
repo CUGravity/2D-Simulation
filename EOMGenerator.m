@@ -8,7 +8,7 @@ d_G1T12 = 0.1;
 d_G1T13 = 0.1;
 lo12 = 1; %rest length
 lo13 = 1; %rest length
-k = 1; %spring constant
+ks = 1; %spring constant
 m1 = 4*(2/3);
 m2 = 4*(1/6);
 m3 = 4*(1/6);
@@ -21,8 +21,8 @@ I_G3 = m3*((2*d_G3T3)^2+d_width^2)/12;
 syms th1 th1d th1dd real;
 syms th2 th2d th2dd real;
 syms th3 th3d th3dd real;
-syms phi12 phid12 phidd12 real; % measured from G1
-syms phi13 phid13 phidd13 real;
+syms phi12 phi12d phi12dd real; % measured from G1
+syms phi13 phi13d phi13dd real;
 syms dis_G1G2 disd_G1G2 disdd_G1G2 dis_G1G3 disd_G1G3 disdd_G1G3 real;
 
 %% Basis vectors
@@ -42,9 +42,14 @@ et_G3G1 = -et_G1G3;
 
 r_G2G1  = dis_G1G2*er_G2G1;
 r_G3G1  = dis_G1G3*er_G3G1;
+r_G1G1 = [0 0 0];
+r_G2G2 = [0 0 0];
+r_G3G3 = [0 0 0];
 
 r_G2T2 = er_G2*d_G2T2;
+r_T2G2 = -r_G2T2;
 r_G3T3 = -er_G3*d_G3T3;
+r_T3G3 = -r_G3T3;
 r_G1T12 = -er_G1*d_G1T12;
 r_G1T13 = er_G1*d_G1T13;
 
@@ -73,32 +78,56 @@ a_G3G1 = (disdd_G1G3 - dis_G1G3*phi13d^2)*er_G1G3 + ...
 a_G3F = a_G3G1 + a_G1F;
 
 %% Spring Forces
-FsT12T2 = k*(r_T12T2 - lo12)*hvs(r_T12T2 - lo12);
-FsT2T12 = -FsT12T2;
-FsT13T3 = k*(r_T13T3 - lo13)*hvs(r_T13T3 - lo13);
-FsT3T13 = -FsT13T3;
+F_T12T2 = ks*(r_T12T2 - lo12)*hvs(r_T12T2 , lo12);
+F_T2T12 = -F_T12T2;
+F_T13T3 = ks*(r_T13T3 - lo13)*hvs(r_T13T3 , lo13);
+F_T3T13 = -F_T13T3;
 
-%% AMB About F (fixed frame)
-M_F = [0 0 0];
-
-H_1F = cross( r_G1F , m1*a_G1F ) + I_G1*th1d*k;
-H_2F = cross( r_G2F , m1*a_G2F ) + I_G1*th1d*k;
-H_3F = cross( r_G3F , m1*a_G3F ) + I_G1*th1d*k;
-H_F = H_1F + H_2F + H_3F;
-
-eqn1 = M_F == H_F;
+%% AMB of System About G1
+% M_G1 = [0 0 0];
+% 
+% H_1G1 = cross( r_G1G1 , m1*a_G1F ) + I_G1*th1d*k;
+% H_2G1 = cross( r_G2G1 , m2*a_G2F ) + I_G2*th2d*k;
+% H_3G1 = cross( r_G3G1 , m3*a_G3F ) + I_G3*th3d*k;
+% H_G1 = H_1G1 + H_2G1 + H_3G1;
+% 
+% eqn1 = M_G1 == H_G1;
 
 %% AMB of 1 About G1
+M_T12G1 = cross( r_T12G1 , F_T12T2 );
+M_T13G1 = cross( r_T13G1 , F_T13T3 );
+M_G1 = M_T12G1 + M_T13G1;
 
+H_G1G1 = cross( r_G1G1 , m1*a_G1F ) + I_G1*th1dd*k;
+H_G1 = H_G1G1;
 
+eqn2 = M_G1 == H_G1;
+
+%% AMB of 2 About G2
+M_T2G2 = cross( r_T2G2 , F_T2T12 );
+M_G2 = M_T2G2;
+
+H_G2G2 = cross( r_G2G2 , m2*a_G2F ) + I_G2*th2dd*k;
+H_G2 = H_G2G2;
+
+eqn3 = M_G2 == H_G2;
+
+%% AMB of 3 About G3
+M_T3G3 = cross( r_T3G3 , F_T3T13 );
+M_G3 = M_T3G3;
+
+H_G3G3 = cross( r_G3G3 , m3*a_G3F ) + I_G3*th3dd*k;
+H_G3 = H_G3G3;
+
+eqn4 = M_G3 == H_G3;
 
 end
 
-function Heaviside = hvs(x)
+function Heaviside = hvs(r,lo)
 % negative heaviside actually
-x = norm(x);
-k = 10000;
-Heaviside = 1/(1 + exp(-2*k*x));
+x = norm(r) - lo;
+khv = 10000;
+Heaviside = 1/(1 + exp(-2*khv*x));
 
 end
 
