@@ -88,15 +88,15 @@ tau_1 = coil1*k;
 tau_2 = coil2*k;
 tau_3 = coil3*k;
 
-%% AMB of System About G1
-M_G1 = tau_1 + tau_2 + tau_3;
-
-H_1G1 = cross( r_G1G1 , m1*a_G1F ) + I_G1*th1d*k;
-H_2G1 = cross( r_G2G1 , m2*a_G2F ) + I_G2*phi12d*k;
-H_3G1 = cross( r_G3G1 , m3*a_G3F ) + I_G3*phi13d*k;
-H_G1 = H_1G1 + H_2G1 + H_3G1;
-
-eqn1 = M_G1 == H_G1;
+%% AMB of System About G1 - TAKEN OUT B/C IT IS A NULL CASE
+% M_G1 = tau_1 + tau_2 + tau_3;
+% 
+% H_1G1 = cross( r_G1G1 , m1*a_G1F ) + I_G1*th1d*k;
+% H_2G1 = cross( r_G2G1 , m2*a_G2F ) + I_G2*phi12d*k;
+% H_3G1 = cross( r_G3G1 , m3*a_G3F ) + I_G3*phi13d*k;
+% H_G1 = H_1G1 + H_2G1 + H_3G1;
+% 
+% eqn1 = M_G1 == H_G1;
 
 %% AMB of 1 About G1
 M_T12G1 = cross( r_T12G1 , F_T12T2 );
@@ -126,10 +126,10 @@ H_G3 = H_G3G3;
 
 eqn4 = M_G3 == H_G3;
 
-%% LMB about 1
-F_t1 = F_T12T2 + F_T13T3;
-
-eqn5 = F_t1 == m1*a_G1F;
+%% LMB about 1 - TAKEN OUT B/C IT IS A NULL CASE
+% F_t1 = F_T12T2 + F_T13T3;
+% 
+% eqn5 = F_t1 == m1*a_G1F;
 
 %% LMB about 2
 F_t2 = F_T2T12;
@@ -146,23 +146,35 @@ eqn7 = F_t3 == m3*a_G3F;
 equations = [ eqn2(3) eqn3(3) eqn4(3) eqn6(1) eqn6(2) eqn7(1) eqn7(2)];
 variables = [ th1dd th2dd th3dd phi12dd phi13dd disdd_G1G2 disdd_G1G3 ];
 
+wid = 'symbolic:solve:SolutionsDependOnConditions';
+warning('off',wid);
 angleDD = solve( equations , variables );
+warning('on',wid);
 
-% angleDD = solve([eqn2(3) eqn3(3) eqn4(3)],[th1dd th2dd th3dd]);
+matlabFunction(angleDD.th1dd,'File','th1dd_file');
+matlabFunction(angleDD.th2dd,'File','th2dd_file');
+matlabFunction(angleDD.th3dd,'File','th3dd_file');
+matlabFunction(angleDD.phi12dd,'File','phi12dd_file');
+matlabFunction(angleDD.phi13dd,'File','phi13dd_file');
+matlabFunction(angleDD.disdd_G1G2,'File','disdd_G1G2_file');
+matlabFunction(angleDD.disdd_G1G3,'File','disdd_G1G3_file');
+
+%EQUIVALENT BUT DONE PIECE BY PIECE
 % th1dd_sol = solve( eqn2(3) , th1dd );
 % th2dd_sol = solve( eqn3(3) , th2dd );
 % th3dd_sol = solve( eqn4(3) , th3dd );
 % G2_sol = solve( [eqn6(1) eqn6(2)],[disdd_G1G2 phi12dd]);
 % G3_sol = solve( [eqn7(1) eqn7(2)],[disdd_G1G3 phi13dd]);
+% matlabFunction(G3_sol.disdd_G1G3,'File','disdd_G1G3');
+% matlabFunction(G3_sol.phi13dd,'File','phi13dd');
+% matlabFunction(G2_sol.disdd_G1G2,'File','disdd_G1G2');
+% matlabFunction(G2_sol.phi12dd,'File','phi12dd');
+% matlabFunction(th1dd_sol,'File','th1dd_sol');
+% matlabFunction(th2dd_sol,'File','th2dd_sol');
+% matlabFunction(th3dd_sol,'File','th3dd_sol');
 
-% matlabFunction(G3_sol.disdd_G1G3,'File','test');
-% matlabFunction(G3_sol.phi13dd,'File','testt');
-
-% matlabFunction(th1dd_sol,'File','test1');
-% matlabFunction(th2dd_sol,'File','test2');
-% matlabFunction(th3dd_sol,'File','test3');
-
-disp(['Script took ',num2str(toc),' seconds']);
+disp('EOM equations generated');
+disp(['Script took ',num2str(toc),' seconds to run']);
 end
 
 function Heaviside = hvs(r,lo)
