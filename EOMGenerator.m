@@ -128,25 +128,39 @@ eqn4 = M_G3 == H_G3;
 
 %% LMB about 1
 F_t1 = F_T12T2 + F_T13T3;
+
 eqn5 = F_t1 == m1*a_G1F;
 
 %% LMB about 2
 F_t2 = F_T2T12;
+
 eqn6 = F_t2 == m2*a_G2F;
 
 %% LMB about 3
 F_t3 = F_T3T13;
+
 eqn7 = F_t3 == m3*a_G3F;
 
 %% Solve EOM equations
 
-equations = [ eqn1(3) eqn2(3) eqn3(3) eqn4(3) eqn5(1) eqn5(2) eqn6(1) ...
-    eqn6(2) eqn7(1) eqn7(2)];
+equations = [ eqn2(3) eqn3(3) eqn4(3) eqn6(1) eqn6(2) eqn7(1) eqn7(2)];
 variables = [ th1dd th2dd th3dd phi12dd phi13dd disdd_G1G2 disdd_G1G3 ];
 
 angleDD = solve( equations , variables );
 
-matlabFunction(eqn1,'File','test');
+% angleDD = solve([eqn2(3) eqn3(3) eqn4(3)],[th1dd th2dd th3dd]);
+% th1dd_sol = solve( eqn2(3) , th1dd );
+% th2dd_sol = solve( eqn3(3) , th2dd );
+% th3dd_sol = solve( eqn4(3) , th3dd );
+% G2_sol = solve( [eqn6(1) eqn6(2)],[disdd_G1G2 phi12dd]);
+% G3_sol = solve( [eqn7(1) eqn7(2)],[disdd_G1G3 phi13dd]);
+
+% matlabFunction(G3_sol.disdd_G1G3,'File','test');
+% matlabFunction(G3_sol.phi13dd,'File','testt');
+
+% matlabFunction(th1dd_sol,'File','test1');
+% matlabFunction(th2dd_sol,'File','test2');
+% matlabFunction(th3dd_sol,'File','test3');
 
 disp(['Script took ',num2str(toc),' seconds']);
 end
@@ -156,5 +170,6 @@ function Heaviside = hvs(r,lo)
 x = r - lo;
 khv = 1000;
 Heaviside = 1/(1 + exp(-2*khv*x));
+% Heaviside = 1;
 end
 
