@@ -23,19 +23,19 @@ if needToGenEOMs
 end
 
 %% Init Controller
-odeP.kp1 = 0;
+odeP.kp1 = 1;
 odeP.kp2 = 0;
 odeP.kp3 = 0;
-odeP.wti = .1;
-odeP.wtf = 1;
-odeP.tfin = tf;
+odeP.wti = .01;
+odeP.wtf = .02;
+odeP.tfin = 750;
 
 %% Propagator
 tic;
 % x_i = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3];
-x_i = [0 0, 0 0, 0 0, pi .01, 0 .01, ...
-    1+param.d_G1T12 0 1+param.d_G1T13 0]; % NULL
+x_i = [0 .01, 0 0, 0 0, pi .01, 0 .01, ...
+    param.lo12+param.d_G1T12 0 param.lo13+param.d_G1T13 0]; % NULL
 tspan=linspace(0,tf,tf*1000);
 [tarray, zarr] = ode45(@RHS, tspan, x_i, odeset, odeP);
 
