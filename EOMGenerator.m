@@ -69,24 +69,24 @@ r_G3F = r_G1G3 + r_G1F;
 %Here is the main advantage of using polar coordinates; the kinematics of
 %the accelerations are easily defined.
 a_G1F = [0 0 0];
-a_G2G1 = (disdd_G1G2 - dis_G1G2*phi12d^2)*er_G1G2 + ...
+a_G1G2 = (disdd_G1G2 - dis_G1G2*phi12d^2)*er_G1G2 + ...
     (dis_G1G2*phi12dd + 2*disd_G1G2*phi12d)*et_G1G2;
-a_G2F = a_G2G1 + a_G1F;
+a_G2F = a_G1G2 + a_G1F;
 
-a_G3G1 = (disdd_G1G3 - dis_G1G3*phi13d^2)*er_G1G3 + ...
-    (dis_G1G3*phi13dd + 2*disd_G1G3*phi13d)*et_G1G3;
-a_G3F = a_G3G1 + a_G1F;
+a_G1G3 = (disdd_G1G3 - dis_G1G3*phi13d^2)*er_G1G3 + ...
+    (dis_G1G3*phi13dd + 2*disd_G1G3*phi12d)*et_G1G3;
+a_G3F = a_G1G3 + a_G1F;
 
 %% Spring Forces
 %The Heaviside function is how we model the tether only acting on one side
 %of the rest length while maintaining a continuous function with no
 %logical/binary statements.
-F_T12T2 = param.ks*r_T12T2*(norm(r_T12T2) - param.lo12)*...
-    hvs(norm(r_T12T2),param.lo12,param.khv);
-F_T2T12 = -F_T12T2;
-F_T13T3 = param.ks*r_T13T3*(norm(r_T13T3) - param.lo13)*...
-    hvs(norm(r_T13T3),param.lo13,param.khv);
-F_T3T13 = -F_T13T3;
+F_T2_on_T12 = param.ks*r_T12T2*(1 - param.lo12/norm(r_T12T2))*...
+    heaviside(norm(r_T12T2)-param.lo12);
+F_T12_on_T2 = -F_T2_on_T12;
+F_T3_on_T13 = param.ks*r_T13T3*(1 - param.lo13/norm(r_T13T3))*...
+    heaviside(norm(r_T13T3)-param.lo13);
+F_T13_on_T3 = -F_T3_on_T13;
 
 %% Torquers
 tau_1 = coil1*k;
@@ -104,23 +104,23 @@ tau_3 = coil3*k;
 % eqn1 = M_G1 == H_G1;
 
 %% AMB of 1 About G1
-M_T12G1 = cross( r_T12G1 , F_T12T2 );
-M_T13G1 = cross( r_T13G1 , F_T13T3 );
-M_G1 = M_T12G1 + M_T13G1 + tau_1;
+M_T12_about_G1 = cross( r_G1T12 , F_T2_on_T12 );
+M_T13_about_G1 = cross( r_G1T13 , F_T3_on_T13 );
+M_G1 = M_T12_about_G1 + M_T13_about_G1 + tau_1;
 H_G1G1 = cross( r_G1G1 , param.m1*a_G1F ) + param.I_G1*th1dd*k;
 H_G1 = H_G1G1;
 eqn2 = M_G1 == H_G1;
 
 %% AMB of 2 About G2
-M_T2G2 = cross( r_T2G2 , F_T2T12 );
-M_G2 = M_T2G2 + tau_2;
+M_T2_about_G2 = cross( r_G2T2 , F_T12_on_T2 );
+M_G2 = M_T2_about_G2 + tau_2;
 H_G2G2 = cross( r_G2G2 , param.m2*a_G2F ) + param.I_G2*th2dd*k;
 H_G2 = H_G2G2;
 eqn3 = M_G2 == H_G2;
 
-%% AMB of 3 About G3
-M_T3G3 = cross( r_T3G3 , F_T3T13 );
-M_G3 = M_T3G3 + tau_3;
+%% AMB of 2 About G2
+M_T3_about_G3 = cross( r_G3T3 , F_T13_on_T3 );
+M_G3 = M_T3_about_G3 + tau_3;
 H_G3G3 = cross( r_G3G3 , param.m3*a_G3F ) + param.I_G3*th3dd*k;
 H_G3 = H_G3G3;
 eqn4 = M_G3 == H_G3;
@@ -130,11 +130,11 @@ eqn4 = M_G3 == H_G3;
 % eqn5 = F_t1 == m1*a_G1F;
 
 %% LMB about 2
-F_t2 = F_T2T12;
+F_t2 = F_T12_on_T2;
 eqn6 = F_t2 == param.m2*a_G2F;
 
 %% LMB about 3
-F_t3 = F_T3T13;
+F_t3 = F_T13_on_T3;
 eqn7 = F_t3 == param.m3*a_G3F;
 
 %% Solve EOM equations
