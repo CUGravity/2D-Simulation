@@ -29,7 +29,7 @@ odeP.kp3 = .1;
 odeP.wti = .1;
 odeP.wtf = .3;
 odeP.tmid = tf/2;
-odeP.kramp = 0.3;
+odeP.kramp = 0.00003;
 
 %% Propagator
 tic;
