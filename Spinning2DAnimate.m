@@ -1,6 +1,9 @@
-function Spinning2DAnimate_EOMs(t , z, param, timeX, filming)
+function Spinning2DAnimate(t , z, param, timeX, filming, withPlots)
 close all;
-
+%
+if withPlots
+    Spinning2DPlot(t,z,1);
+end
 %% Coordinate conversion
 % z = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3];
@@ -63,26 +66,40 @@ r_G3F = r_G1G3 + r_G1F;
 
 %% Plot Body Traces
 figure; hold on;
-plot(r_G1F(:,1), r_G2F(:,2), '--k');
-plot(r_G2F(end,1), r_G2F(end,2), 'ok');
+% fig.Position(3) = fig.Position(3)*2;
+% subplot(1,2,1);
+plot(r_G1F(:,1), r_G1F(:,2), '--k');
+plot(r_G1F(end,1), r_G1F(end,2), 'ok');
+plot(r_G1F(1,1), r_G1F(1,2), '*k');
+
 plot(r_G2F(:,1), r_G2F(:,2), '--k');
 plot(r_G2F(end,1), r_G2F(end,2), 'ok');
 plot(r_G2F(1,1), r_G2F(1,2), '*k');
+
 plot(r_G3F(:,1), r_G3F(:,2), '--k');
 plot(r_G3F(end,1), r_G3F(end,2), 'ok');
 plot(r_G3F(1,1), r_G3F(1,2), '*k');
 title(['Three Body Tethered Simulation, Xspeed=',num2str(timeX)]);
 shg;
 
+%% Line Objects
+
+r_T2 = r_G2F+r_G2T2;
+r_T12 = r_G1F+r_G1T12;
+tether_2_to_1 = line([r_T2(1,1) r_T12(1,1)],[r_T2(1,2) r_T12(1,2)]);
+r_T3 = r_G3F+r_G3T3;
+r_T13 = r_G1F+r_G1T13;
+tether_3_to_1 = line([r_T3(1,1) r_T13(1,1)],[r_T3(1,2) r_T13(1,2)]);
+
 %% Box Objects
 xverts1 = [-param.d_G1T12, param.d_G1T12, param.d_G1T12, -param.d_G1T12];
-yverts1 = [param.d_width, param.d_width, -param.d_width, -param.d_width];
+yverts1 = [param.d_width, param.d_width, -param.d_width, -param.d_width]/2;
 s1 = patch(xverts1,yverts1,'r');
 xverts2 = [-param.d_G2T2, param.d_G2T2, param.d_G2T2, -param.d_G2T2];
-yverts2 = [param.d_width, param.d_width, -param.d_width, -param.d_width];
+yverts2 = [param.d_width, param.d_width, -param.d_width, -param.d_width]/2;
 s2 = patch(xverts2,yverts2,'b');
 xverts3 = [-param.d_G3T3, param.d_G3T3, param.d_G3T3, -param.d_G3T3];
-yverts3 = [param.d_width, param.d_width, -param.d_width, -param.d_width];
+yverts3 = [param.d_width, param.d_width, -param.d_width, -param.d_width]/2;
 s3 = patch(xverts3,yverts3,'g');
 
 oV1 = s1.Vertices;
@@ -96,7 +113,6 @@ if filming
     open(vwr);
 end
 axis([-param.lo12 param.lo12 -param.lo12 param.lo12]*1.5);
-ind = 1;
 tic;
 while currTime < t(end)
     
@@ -106,7 +122,7 @@ while currTime < t(end)
     y2 = interp1(t,r_G2F(:,2),currTime*timeX);
     x3 = interp1(t,r_G3F(:,1),currTime*timeX);
     y3 = interp1(t,r_G3F(:,2),currTime*timeX);
-       
+    
     th1i = interp1(t,th1,currTime*timeX);
     th2i = interp1(t,th2,currTime*timeX);
     th3i = interp1(t,th3,currTime*timeX);
@@ -122,6 +138,20 @@ while currTime < t(end)
     s1.Vertices = [rot1(:,1) + x1 , rot1(:,2) + y1];
     s2.Vertices = [rot2(:,1) + x2 , rot2(:,2) + y2];
     s3.Vertices = [rot3(:,1) + x3 , rot3(:,2) + y3];
+    
+    xt12 = interp1(t,r_T12(:,1),currTime*timeX);
+    yt12 = interp1(t,r_T12(:,2),currTime*timeX);
+    xt13 = interp1(t,r_T13(:,1),currTime*timeX);
+    yt13 = interp1(t,r_T13(:,2),currTime*timeX);
+    xt2 = interp1(t,r_T2(:,1),currTime*timeX);
+    yt2 = interp1(t,r_T2(:,2),currTime*timeX);
+    xt3 = interp1(t,r_T3(:,1),currTime*timeX);
+    yt3 = interp1(t,r_T3(:,2),currTime*timeX);
+    
+    tether_2_to_1.XData = [xt2 , xt12];
+    tether_2_to_1.YData = [yt2 , yt12];
+    tether_3_to_1.XData = [xt3 , xt13];
+    tether_3_to_1.YData = [yt3 , yt13];
     
     drawnow;
     currTime = toc;

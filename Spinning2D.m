@@ -1,4 +1,4 @@
-function [tarray , zarr , param] = Spinning2D_EOMs(tf,needToGenEOMs)
+function [tarray , zarr , param] = Spinning2D(tf,needToGenEOMs)
 close all;
 %% Generate EOMs and add them to the path
 
@@ -7,9 +7,9 @@ param.d_G2T2 = 0.025;
 param.d_G3T3 = 0.025;
 param.d_G1T12 = 0.1;
 param.d_G1T13 = 0.1;
-param.lo12 = 1; %rest length
-param.lo13 = 1; %rest length
-param.ks = 10; %spring constant
+param.lo12 = 15; %rest length
+param.lo13 = 15; %rest length
+param.ks = 100; %spring constant
 param.m1 = 4*(2/3);
 param.m2 = 4*(1/6);
 param.m3 = 4*(1/6);
@@ -23,18 +23,19 @@ if needToGenEOMs
 end
 
 %% Init Controller
-odeP.kp1 = 1;
-odeP.kp2 = 0;
-odeP.kp3 = 0;
-odeP.wti = .01;
-odeP.wtf = .02;
-odeP.tfin = 750;
+odeP.kp1 = 10;
+odeP.kp2 = .1;
+odeP.kp3 = .1;
+odeP.wti = .1;
+odeP.wtf = .3;
+odeP.tmid = tf/2;
+odeP.kramp = 0.3;
 
 %% Propagator
 tic;
 % x_i = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3];
-x_i = [0 .01, 0 0, 0 0, pi .01, 0 .01, ...
+x_i = [0 .01, 0 0, 0 0, pi .1+1e-3, 0 .1, ...
     param.lo12+param.d_G1T12 0 param.lo13+param.d_G1T13 0]; % NULL
 tspan=linspace(0,tf,tf*1000);
 [tarray, zarr] = ode45(@RHS, tspan, x_i, odeset, odeP);
@@ -47,7 +48,6 @@ function xdot = RHS(t,x,odeP)
 %     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3];
 %x_dot=[th1d th1dd, th2d th2dd, th3d th3dd, phi12d phi12dd, phi13d phi13dd,
 %     disd_G1G2 disdd_G1G2 disd_G1G3 disdd_G1G3];
-
 th1 = x(1);
 th1d = x(2);
 th2 = x(3);
@@ -63,7 +63,8 @@ disd_G1G2 = x(12);
 dis_G1G3 = x(13);
 disd_G1G3 = x(14);
 
-wtarget = odeP.wti + t*(odeP.wtf-odeP.wti)/odeP.tfin;
+% wtarget = odeP.wti + t*(odeP.wtf-odeP.wti)/odeP.tfin;
+wtarget = odeP.wti +(odeP.wtf-odeP.wti)/(1+exp(-odeP.kramp*(t-odeP.tmid)));
 
 [coil1, coil2, coil3] = TorqueController1(x,odeP,wtarget);
 
