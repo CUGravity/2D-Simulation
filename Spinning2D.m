@@ -12,7 +12,7 @@ param.lo13 = 1; %rest length
 % Dyneema
 tethE = 1.72e11; % 172000 MPa
 tethA = pi*((5e-4)/2)^2; % diameter = 0.5mm
-param.ks = (tethE*tethA/param.lo12) %spring constant
+param.ks = (tethE*tethA/param.lo12); %spring constant
 % param.ks = 100; %spring constant
 param.m1 = 4*(2/3);
 param.m2 = 4*(1/6);
@@ -33,7 +33,7 @@ odeP.kp3 = .1;
 odeP.wti = .1;
 odeP.wtf = .3;
 odeP.tmid = tf/2;
-odeP.kramp = 0.00003;
+odeP.kramp = 0.03;
 
 %% Propagator
 tic;

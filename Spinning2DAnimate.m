@@ -83,7 +83,6 @@ title(['Three Body Tethered Simulation, Xspeed=',num2str(timeX)]);
 shg;
 
 %% Line Objects
-
 r_T2 = r_G2F+r_G2T2;
 r_T12 = r_G1F+r_G1T12;
 tether_2_to_1 = line([r_T2(1,1) r_T12(1,1)],[r_T2(1,2) r_T12(1,2)]);
@@ -108,24 +107,33 @@ oV3 = s3.Vertices;
 
 %% Animate
 currTime = 0;
+dim = [.69 0 .3 .24];
+str = ['time = ',num2str(currTime)];
+anno1 = annotation('textbox',dim,'String',str,'FitBoxToText','on');
+dim = [.55 0 .3 .175];
+str = ['Rotation Rate = ',num2str(0)];
+anno2 = annotation('textbox',dim,'String',str,'FitBoxToText','on');
+
 if filming
     vwr = VideoWriter('2D Animation.avi');
     open(vwr);
 end
 axis([-param.lo12 param.lo12 -param.lo12 param.lo12]*1.5);
 tic;
-while currTime < t(end)
+
+while currTime*timeX < t(end)
+    cTx = currTime*timeX;
+        
+    x1 = interp1(t,r_G1F(:,1),cTx);
+    y1 = interp1(t,r_G1F(:,2),cTx);
+    x2 = interp1(t,r_G2F(:,1),cTx);
+    y2 = interp1(t,r_G2F(:,2),cTx);
+    x3 = interp1(t,r_G3F(:,1),cTx);
+    y3 = interp1(t,r_G3F(:,2),cTx);
     
-    x1 = interp1(t,r_G1F(:,1),currTime*timeX);
-    y1 = interp1(t,r_G1F(:,2),currTime*timeX);
-    x2 = interp1(t,r_G2F(:,1),currTime*timeX);
-    y2 = interp1(t,r_G2F(:,2),currTime*timeX);
-    x3 = interp1(t,r_G3F(:,1),currTime*timeX);
-    y3 = interp1(t,r_G3F(:,2),currTime*timeX);
-    
-    th1i = interp1(t,th1,currTime*timeX);
-    th2i = interp1(t,th2,currTime*timeX);
-    th3i = interp1(t,th3,currTime*timeX);
+    th1i = interp1(t,th1,cTx);
+    th2i = interp1(t,th2,cTx);
+    th3i = interp1(t,th3,cTx);
     
     rotation1 = [cos(th1i),-sin(th1i); sin(th1i),cos(th1i)];
     rotation2 = [cos(th2i),-sin(th2i); sin(th2i),cos(th2i)];
@@ -139,19 +147,26 @@ while currTime < t(end)
     s2.Vertices = [rot2(:,1) + x2 , rot2(:,2) + y2];
     s3.Vertices = [rot3(:,1) + x3 , rot3(:,2) + y3];
     
-    xt12 = interp1(t,r_T12(:,1),currTime*timeX);
-    yt12 = interp1(t,r_T12(:,2),currTime*timeX);
-    xt13 = interp1(t,r_T13(:,1),currTime*timeX);
-    yt13 = interp1(t,r_T13(:,2),currTime*timeX);
-    xt2 = interp1(t,r_T2(:,1),currTime*timeX);
-    yt2 = interp1(t,r_T2(:,2),currTime*timeX);
-    xt3 = interp1(t,r_T3(:,1),currTime*timeX);
-    yt3 = interp1(t,r_T3(:,2),currTime*timeX);
+    xt12 = interp1(t,r_T12(:,1),cTx);
+    yt12 = interp1(t,r_T12(:,2),cTx);
+    xt13 = interp1(t,r_T13(:,1),cTx);
+    yt13 = interp1(t,r_T13(:,2),cTx);
+    xt2 = interp1(t,r_T2(:,1),cTx);
+    yt2 = interp1(t,r_T2(:,2),cTx);
+    xt3 = interp1(t,r_T3(:,1),cTx);
+    yt3 = interp1(t,r_T3(:,2),cTx);
     
     tether_2_to_1.XData = [xt2 , xt12];
     tether_2_to_1.YData = [yt2 , yt12];
     tether_3_to_1.XData = [xt3 , xt13];
     tether_3_to_1.YData = [yt3 , yt13];
+    
+    anno1.String = ['time = ',num2str(cTx,'%.2f'),' sec'];
+    
+    phi12di = interp1(t,phi12d,cTx);
+    phi13di = interp1(t,phi13d,cTx);
+    anno2.String = ['Rotation Rate = ', ...
+        num2str((phi12di+phi13di)*0.5,'%.3f'),' rad/sec'];
     
     drawnow;
     currTime = toc;
