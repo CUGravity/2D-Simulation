@@ -7,9 +7,13 @@ param.d_G2T2 = 0.025;
 param.d_G3T3 = 0.025;
 param.d_G1T12 = 0.1;
 param.d_G1T13 = 0.1;
-param.lo12 = 15; %rest length
-param.lo13 = 15; %rest length
-param.ks = 100; %spring constant
+param.lo12 = 1; %rest length
+param.lo13 = 1; %rest length
+% Dyneema
+tethE = 1.72e11; % 172000 MPa
+tethA = pi*((5e-4)/2)^2; % diameter = 0.5mm
+param.ks = (tethE*tethA/param.lo12) %spring constant
+% param.ks = 100; %spring constant
 param.m1 = 4*(2/3);
 param.m2 = 4*(1/6);
 param.m3 = 4*(1/6);
