@@ -36,12 +36,13 @@ odeP.kramp = 0.03;
 
 %% Propagator
 tic;
+opts = odeset('RelTol',1e-10,'AbsTol',1e-10);
 % x_i = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3, x1 x1d, y1 y1d];
-x_i = [0 0, 0 0, 0 0, pi .09, 0 .1, ...
+x_i = [0 0, 0 0, 0 0, pi .1, 0 .1, ...
     param.lo12+param.d_G1T12 0 param.lo13+param.d_G1T13 0, 0 0, 0 0]; % NULL
 tspan=linspace(0,tf,tf*1000);
-[tarray, zarr] = ode45(@RHS, tspan, x_i, odeset, odeP);
+[tarray, zarr] = ode45(@RHS, tspan, x_i, opts, odeP);
 
 disp(['ode45 took ',num2str(toc),' seconds to run']);
 end
