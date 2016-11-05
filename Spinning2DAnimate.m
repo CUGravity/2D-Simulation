@@ -6,7 +6,7 @@ if withPlots
 end
 %% Coordinate conversion
 % z = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
-%     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3];
+%     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3, x1 x1d, y1 y1d];
 th1 = z(:,1);
 th1d = z(:,2);
 th2 = z(:,3);
@@ -21,6 +21,10 @@ dis_G1G2 = z(:,11);
 disd_G1G2 = z(:,12);
 dis_G1G3 = z(:,13);
 disd_G1G3 = z(:,14);
+x1 = z(:,15);
+x1d = z(:,16);
+y1 = z(:,17);
+y1d = z(:,18);
 
 %% TAKEN FROM COORD FRAMES IN EOMGenerator
 er_G1 = [cos(th1) sin(th1) 0*th1]; et_G1 = [-sin(th1) cos(th1) 0*th1];
@@ -60,7 +64,7 @@ r_T13T3 = r_T13G1 + r_G1G3 + r_G3T3;
 r_T3T13 = -r_T13T3;
 
 %THESE ARE THE ONES WE WANT TO BE PLOTTING
-r_G1F = zeros(length(th1),3);%=[0 0 0];
+r_G1F = [x1 y1 zeros(size(x1))];
 r_G2F = r_G1G2 + r_G1F;
 r_G3F = r_G1G3 + r_G1F;
 

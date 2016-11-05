@@ -1,7 +1,7 @@
 function Spinning2DPlot( t, z, down )
 close all;
 % x_i = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
-%     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3];
+%     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3, x1 x1d, y1 y1d];
 
 figure;
 plot(t,z(:,[8 10]));

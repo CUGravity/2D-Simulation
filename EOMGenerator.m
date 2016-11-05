@@ -13,6 +13,7 @@ tic;
 %% Symbolic variables
 %Anything wanted as an input or output to these EOM files needs to be
 %defined and used symbolically.
+syms x_G1 xd_G1 xdd_G1 y_G1 yd_G1 ydd_G1 real;
 syms th1 th1d th1dd real;
 syms th2 th2d th2dd real;
 syms th3 th3d th3dd real;
@@ -61,14 +62,14 @@ r_T13G1 = -r_G1T13;
 r_T13T3 = r_T13G1 + r_G1G3 + r_G3T3;
 r_T3T13 = -r_T13T3;
 
-r_G1F = [0 0 0];
+r_G1F = [x_G1 y_G1 0];
 r_G2F = r_G1G2 + r_G1F;
 r_G3F = r_G1G3 + r_G1F;
 
 %% Kinematics
 %Here is the main advantage of using polar coordinates; the kinematics of
 %the accelerations are easily defined.
-a_G1F = [0 0 0];
+a_G1F = [xdd_G1 ydd_G1 0];
 a_G1G2 = (disdd_G1G2 - dis_G1G2*phi12d^2)*er_G1G2 + ...
     (dis_G1G2*phi12dd + 2*disd_G1G2*phi12d)*et_G1G2;
 a_G2F = a_G1G2 + a_G1F;
@@ -125,9 +126,9 @@ H_G3G3 = cross( r_G3G3 , param.m3*a_G3F ) + param.I_G3*th3dd*k;
 H_G3 = H_G3G3;
 eqn4 = M_G3 == H_G3;
 
-%% LMB about 1 - TAKEN OUT B/C IT IS A NULL CASE
-% F_t1 = F_T12T2 + F_T13T3;
-% eqn5 = F_t1 == m1*a_G1F;
+%% LMB about 1
+F_t1 = F_T2_on_T12 + F_T3_on_T13;
+eqn5 = F_t1 == param.m1*a_G1F;
 
 %% LMB about 2
 F_t2 = F_T12_on_T2;
@@ -142,8 +143,8 @@ eqn7 = F_t3 == param.m3*a_G3F;
 %then use MATLAB's powerful "solve" function to give us the variables we
 %want as functions of the variables we have. Then we can generate those
 %functions as function files for use in the ode45 we will implement later.
-equations = [ eqn2(3) eqn3(3) eqn4(3) eqn6(1) eqn6(2) eqn7(1) eqn7(2)];
-variables = [ th1dd th2dd th3dd phi12dd phi13dd disdd_G1G2 disdd_G1G3 ];
+equations = [ eqn2(3) eqn3(3) eqn4(3) eqn5(1) eqn5(2) eqn6(1) eqn6(2) eqn7(1) eqn7(2)];
+variables = [ xdd_G1 ydd_G1 th1dd th2dd th3dd phi12dd phi13dd disdd_G1G2 disdd_G1G3 ];
 
 wid = 'symbolic:solve:SolutionsDependOnConditions';
 warning('off',wid);
@@ -151,6 +152,8 @@ angleDD = solve( equations , variables );
 warning('on',wid);
 
 mkdir(pwd,'EOMs');
+matlabFunction(angleDD.xdd_G1,'File','EOMs/xdd_G1_EOM');
+matlabFunction(angleDD.ydd_G1,'File','EOMs/ydd_G1_EOM');
 matlabFunction(angleDD.th1dd,'File','EOMs/th1dd_EOM');
 matlabFunction(angleDD.th2dd,'File','EOMs/th2dd_EOM');
 matlabFunction(angleDD.th3dd,'File','EOMs/th3dd_EOM');
@@ -176,13 +179,3 @@ addpath('EOMs');
 
 disp(['EOM Generation took ',num2str(toc),' seconds to run']);
 end
-
-function Heaviside = hvs(r,lo,khv)
-%Technically this is a negative Heaviside function because we want it to
-%equal 
-x = r - lo;
-% khv = 1000;
-Heaviside = 1/(1 + exp(-2*khv*x));
-% Heaviside = 1;
-end
-
