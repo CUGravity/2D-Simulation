@@ -12,7 +12,7 @@ param.lo13 = 1; %rest length
 % Dyneema
 tethE = 1.72e11; % 172000 MPa
 tethA = pi*((5e-4)/2)^2; % diameter = 0.5mm
-param.ks = (tethE*tethA/param.lo12); %spring constant
+param.tethEA = tethE*tethA;
 % param.ks = 100; %spring constant
 param.m1 = 4*(2/3);
 param.m2 = 4*(1/6);
