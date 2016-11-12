@@ -3,10 +3,13 @@ close all;
 %% Generate EOMs and add them to the path
 
 param.d_width = 0.1;
+param.d_length1 = 0.2;
 param.d_G2T2 = 0.025;
 param.d_G3T3 = 0.025;
-param.d_G1T12 = 0.1;
-param.d_G1T13 = 0.1;
+% the center sat has a total length of 20cm,
+% but tethers are anchored 5cm from ends
+param.d_G1T12 = 0.05;
+param.d_G1T13 = 0.05;
 % Dyneema
 tethE = 1.72e11; % 172000 MPa
 tethA = pi*((5e-4)/2)^2; % diameter = 0.5mm

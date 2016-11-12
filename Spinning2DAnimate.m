@@ -95,7 +95,7 @@ r_T13 = r_G1F+r_G1T13;
 tether_3_to_1 = line([r_T3(1,1) r_T13(1,1)],[r_T3(1,2) r_T13(1,2)]);
 
 %% Box Objects
-xverts1 = [-param.d_G1T12, param.d_G1T12, param.d_G1T12, -param.d_G1T12];
+xverts1 = [-param.d_length1, param.d_length1, param.d_length1, -param.d_length1]/2;
 yverts1 = [param.d_width, param.d_width, -param.d_width, -param.d_width]/2;
 s1 = patch(xverts1,yverts1,'r');
 xverts2 = [-param.d_G2T2, param.d_G2T2, param.d_G2T2, -param.d_G2T2];
