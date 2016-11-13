@@ -21,8 +21,16 @@ end
 
 figure;
 plot(t,z(:,[11 13]));
-title('Tether Distances');
+title('Body Distances');
 legend('G1 to G2','G1 to G3');
+if down
+    movegui('southeast');
+end
+
+figure;
+plot(t,z(:,[21 22]));
+title('Tether Tension');
+legend('T1 to T2','T1 to T3');
 if down
     movegui('southeast');
 end

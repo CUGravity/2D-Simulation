@@ -1,4 +1,4 @@
-function [tarray , zarr , param] = Spinning2D(tf,needToGenEOMs)
+function [tarray , zarr_extra , param] = Spinning2D(tf,needToGenEOMs)
 close all;
 %% Generate EOMs and add them to the path
 
@@ -45,10 +45,16 @@ x_i = [0 .1, 0 .1, 0 .1, pi .1, 0 .1, ...
 tspan=linspace(0,tf,tf*1000);
 [tarray, zarr] = ode45(@RHS, tspan, x_i, opts, odeP);
 
+zarr_extra = [zarr, zeros(numel(tarray),4)];
+for a = 1:numel(tarray)
+    [~, Lo12, Lo13, F12, F13] = RHS(tarray(a),zarr(a,:),odeP);
+    zarr_extra(a,end-3:end) = [Lo12, Lo13, F12, F13];
+end
+
 disp(['ode45 took ',num2str(toc),' seconds to run']);
 end
 
-function xdot = RHS(t,x,odeP)
+function [xdot, Lo12, Lo13, F12, F13] = RHS(t,x,odeP)
 %x = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3];
 %x_dot=[th1d th1dd, th2d th2dd, th3d th3dd, phi12d phi12dd, phi13d phi13dd,
@@ -84,7 +90,7 @@ coil1 = 2e-5;
 coil2 = 0;
 coil3 = 0;
 
-[x1dd,y1dd,th1dd,th2dd,th3dd,phi12dd,phi13dd,disdd_G1G2,disdd_G1G3] = ...
+[x1dd,y1dd,th1dd,th2dd,th3dd,phi12dd,phi13dd,disdd_G1G2,disdd_G1G3,F12,F13] = ...
     merged_EOM(Lo12,Lo13,coil1,coil2,coil3,dis_G1G2,dis_G1G3,disd_G1G2,...
     disd_G1G3,phi12,phi13,phi12d,phi13d,th1,th2,th3);
 
