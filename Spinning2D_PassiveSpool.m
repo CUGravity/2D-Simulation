@@ -1,4 +1,4 @@
-function [tarray , zarr , param] = Spinning2D_PassiveSpool(tf,needToGenEOMs)
+function [tarray , zarr_extra , param] = Spinning2D(tf,needToGenEOMs)
 close all;
 %% Generate EOMs and add them to the path
 
@@ -41,14 +41,20 @@ opts = odeset('RelTol',1e-10,'AbsTol',1e-10);
 % x_i = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3, x1 x1d, y1 y1d, Lo12, Lo13];
 x_i = [0 .1, 0 .1, 0 .1, pi .1, 0 .1, ...
-    1+param.d_G1T12+param.d_G2T2 0 1.1+param.d_G1T13+param.d_G3T3 0, 0 0, 0 0, 1, 1.1]; % NULL
+    1+param.d_G1T12+param.d_G2T2 0 1+param.d_G1T13+param.d_G3T3 0, 0 0, 0 0, 1, 1]; % NULL
 tspan=linspace(0,tf,tf*1000);
 [tarray, zarr] = ode45(@RHS, tspan, x_i, opts, odeP);
+
+zarr_extra = [zarr, zeros(numel(tarray),2)];
+for a = 1:numel(tarray)
+    [~, F12, F13] = RHS(tarray(a),zarr(a,:),odeP);
+    zarr_extra(a,end-1:end) = [F12, F13];
+end
 
 disp(['ode45 took ',num2str(toc),' seconds to run']);
 end
 
-function xdot = RHS(t,x,odeP)
+function [xdot, F12, F13] = RHS(t,x,odeP)
 %x = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3];
 %x_dot=[th1d th1dd, th2d th2dd, th3d th3dd, phi12d phi12dd, phi13d phi13dd,
