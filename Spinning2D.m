@@ -40,8 +40,8 @@ tic;
 opts = odeset('RelTol',1e-10,'AbsTol',1e-10);
 % x_i = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3, x1 x1d, y1 y1d];
-x_i = [0 .1, 0 .1, 0 .1, pi .1, 0 .1, ...
-    1+param.d_G1T12+param.d_G2T2 0 1+param.d_G1T13+param.d_G3T3 0, 0 0, 0 0]; % NULL
+x_i = [0 .5, 0 .5, 0 .5, pi .5, 0 .5, ...
+    4*(2/3/param.tethEA+1)+param.d_G1T12+param.d_G2T2 0 4*(2/3/param.tethEA+1)+param.d_G1T13+param.d_G3T3 0, 0 0, 0 0]; % NULL
 tspan=linspace(0,tf,tf*1000);
 [tarray, zarr] = ode45(@RHS, tspan, x_i, opts, odeP);
 
@@ -79,8 +79,8 @@ y1 = x(17);
 y1d = x(18);
 
 % define tether rest lengths - these can be configured to change with time
-Lo12 = 1;
-Lo13 = 1;
+Lo12 = 4+0.1*heaviside(t-50);
+Lo13 = 4+0.1*heaviside(t-50);
 
 % wtarget = odeP.wti + t*(odeP.wtf-odeP.wti)/odeP.tfin;
 wtarget = odeP.wti +(odeP.wtf-odeP.wti)/(1+exp(-odeP.kramp*(t-odeP.tmid)));
