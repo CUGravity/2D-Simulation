@@ -1,4 +1,4 @@
-function [tarray , zarr_extra , param] = Spinning2D(tf,needToGenEOMs)
+function [tarray , zarr_extra , param] = Spinning2D_PassiveSpool(tf,needToGenEOMs)
 close all;
 %% Generate EOMs and add them to the path
 
