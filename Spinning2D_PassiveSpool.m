@@ -41,7 +41,7 @@ opts = odeset('RelTol',1e-10,'AbsTol',1e-10);
 % x_i = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3, x1 x1d, y1 y1d, Lo12, Lo13];
 x_i = [0 .1, 0 .1, 0 .1, pi .1, 0 .1, ...
-    1+param.d_G1T12+param.d_G2T2 0 1+param.d_G1T13+param.d_G3T3 0, 0 0, 0 0, 1, 1]; % NULL
+    1+param.d_G1T12+param.d_G2T2 0 1.5+param.d_G1T13+param.d_G3T3 0, 0 0, 0 0, 1, 1.5]; % NULL
 tspan=linspace(0,tf,tf*1000);
 [tarray, zarr] = ode45(@RHS, tspan, x_i, opts, odeP);
 
@@ -92,8 +92,8 @@ coil3 = 0;
     merged_EOM(Lo12,Lo13,coil1,coil2,coil3,dis_G1G2,dis_G1G3,disd_G1G2,...
     disd_G1G3,phi12,phi13,phi12d,phi13d,th1,th2,th3);
 
-Lo12d = (0.2*F12-0.1*0.01)*heaviside(F12-0.01);
-Lo13d = (0.2*F13-0.1*0.01)*heaviside(F13-0.01);
+Lo12d = (1*(F12-0.01))*heaviside(F12-0.01);
+Lo13d = (1*(F13-0.01))*heaviside(F13-0.01);
 
 xdot = [th1d th1dd, th2d th2dd, th3d th3dd, phi12d phi12dd, ...
     phi13d phi13dd, disd_G1G2 disdd_G1G2 disd_G1G3 disdd_G1G3, x1d x1dd, y1d y1dd, Lo12d, Lo13d]';

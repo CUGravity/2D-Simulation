@@ -122,7 +122,7 @@ if filming
     vwr = VideoWriter('2D Animation.avi');
     open(vwr);
 end
-axis([-1 1 -1 1]*1.5);
+axis([-2 2 -2 2]*1);
 axis square;
 tic;
 
