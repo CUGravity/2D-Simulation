@@ -40,7 +40,7 @@ tic;
 opts = odeset('RelTol',1e-10,'AbsTol',1e-10);
 % x_i = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %     dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3, x1 x1d, y1 y1d];
-x_i = [0 0, 0 0, 0 0, pi .1, 0 .1, ...
+x_i = [0 .1, 0 .1, 0 .1, pi .1, 0 .1, ...
     1+param.d_G1T12+param.d_G2T2 0 1+param.d_G1T13+param.d_G3T3 0, 0 0, 0 0]; % NULL
 tspan=linspace(0,tf,tf*1000);
 [tarray, zarr] = ode45(@RHS, tspan, x_i, opts, odeP);
@@ -79,17 +79,14 @@ Lo13 = 1;
 % wtarget = odeP.wti + t*(odeP.wtf-odeP.wti)/odeP.tfin;
 wtarget = odeP.wti +(odeP.wtf-odeP.wti)/(1+exp(-odeP.kramp*(t-odeP.tmid)));
 
-[coil1, coil2, coil3] = TorqueController1(x,odeP,wtarget);
+%[coil1, coil2, coil3] = TorqueController1(x,odeP,wtarget);
+coil1 = 2e-5;
+coil2 = 0;
+coil3 = 0;
 
-th1dd = th1dd_EOM(Lo12,Lo13,coil1,dis_G1G2,dis_G1G3,phi12,phi13,th1,th2,th3);
-th2dd = th2dd_EOM(Lo12,coil2,dis_G1G2,phi12,th1,th2);
-th3dd = th3dd_EOM(Lo13,coil3,dis_G1G3,phi13,th1,th3);
-phi12dd = phi12dd_EOM(Lo12,Lo13,dis_G1G2,dis_G1G3,disd_G1G2,phi12,phi13,phi12d,th1,th2,th3);
-phi13dd = phi13dd_EOM(Lo12,Lo13,dis_G1G2,dis_G1G3,disd_G1G3,phi12,phi13,phi12d,th1,th2,th3);
-disdd_G1G2 = disdd_G1G2_EOM(Lo12,Lo13,dis_G1G2,dis_G1G3,phi12,phi13,phi12d,th1,th2,th3);
-disdd_G1G3 = disdd_G1G3_EOM(Lo12,Lo13,dis_G1G2,dis_G1G3,phi12,phi13,phi13d,th1,th2,th3);
-x1dd = xdd_G1_EOM(Lo12,Lo13,dis_G1G2,dis_G1G3,phi12,phi13,th1,th2,th3);
-y1dd = ydd_G1_EOM(Lo12,Lo13,dis_G1G2,dis_G1G3,phi12,phi13,th1,th2,th3);
+[x1dd,y1dd,th1dd,th2dd,th3dd,phi12dd,phi13dd,disdd_G1G2,disdd_G1G3] = ...
+    merged_EOM(Lo12,Lo13,coil1,coil2,coil3,dis_G1G2,dis_G1G3,disd_G1G2,...
+    disd_G1G3,phi12,phi13,phi12d,phi13d,th1,th2,th3);
 
 xdot = [th1d th1dd, th2d th2dd, th3d th3dd, phi12d phi12dd, ...
     phi13d phi13dd, disd_G1G2 disdd_G1G2 disd_G1G3 disdd_G1G3, x1d x1dd, y1d y1dd]';
