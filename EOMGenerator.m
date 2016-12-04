@@ -22,6 +22,8 @@ syms phi13 phi13d phi13dd real;
 syms dis_G1G2 disd_G1G2 disdd_G1G2 dis_G1G3 disd_G1G3 disdd_G1G3 real;
 syms coil1 coil2 coil3 real;
 syms Lo12 Lo13 real; % rest length of tether
+syms Ldamp12 Ldamp13 real; % length of spring-dashpot attached between tether and end-sats
+syms Ldamp12d Ldamp13d real; % derivative of spring-dashpot
 
 %% Basis vectors
 %Define system axis. Everything at the end is in Cartesian though local
@@ -80,17 +82,26 @@ a_G1G3 = (disdd_G1G3 - dis_G1G3*phi13d^2)*er_G1G3 + ...
 a_G3F = a_G1G3 + a_G1F;
 
 %% Spring Forces
+% first calculate length of tethers
+L12 = norm(r_T12T2)-Ldamp12;
+L13 = norm(r_T13T3)-Ldamp13;
+% second calculate tension of tether
 %The Heaviside function is how we model the tether only acting on one side
 %of the rest length while maintaining a continuous function with no
 %logical/binary statements.
-F_T2_on_T12 = param.tethEA*(norm(r_T12T2)/Lo12-1)*...
-    heaviside(norm(r_T12T2)-Lo12)*...
-    r_T12T2/norm(r_T12T2);
+tension12 = param.tethEA*(L12/Lo12-1)*heaviside(L12-Lo12);
+tension13 = param.tethEA*(L13/Lo13-1)*heaviside(L13-Lo13);
+% third calculate the forces on the tension connections
+F_T2_on_T12 = tension12*r_T12T2/norm(r_T12T2);
+F_T3_on_T13 = tension13*r_T13T3/norm(r_T13T3);
 F_T12_on_T2 = -F_T2_on_T12;
-F_T3_on_T13 = param.tethEA*(norm(r_T13T3)/Lo13-1)*...
-    heaviside(norm(r_T13T3)-Lo13)*...
-    r_T13T3/norm(r_T13T3);
 F_T13_on_T3 = -F_T3_on_T13;
+% fourth calculate the change in length of the damper
+% note: tension = k*length + c*length_dot
+% also note: the tension in the damper must equal the tension in the tether
+Ldamp12d = (tension12 - param.lindamp_k*Ldamp12)/param.lindamp_c;
+Ldamp13d = (tension13 - param.lindamp_k*Ldamp13)/param.lindamp_c;
+
 
 %% Torquers
 tau_1 = coil1*k;
@@ -166,13 +177,16 @@ matlabFunction(angleDD.disdd_G1G2,'File','EOMs/disdd_G1G2_EOM');
 matlabFunction(angleDD.disdd_G1G3,'File','EOMs/disdd_G1G3_EOM');
 matlabFunction(norm(F_T2_on_T12),'File','EOMs/F12_EOM');
 matlabFunction(norm(F_T3_on_T13),'File','EOMs/F13_EOM');
+matlabFunction(Ldamp12d,'File','EOMs/Ldamp12_EOM');
+matlabFunction(Ldamp13d,'File','EOMs/Ldamp13_EOM');
 matlabFunction(angleDD.xdd_G1,angleDD.ydd_G1,angleDD.th1dd,...
     angleDD.th2dd,angleDD.th3dd,angleDD.phi12dd,angleDD.phi13dd,...
     angleDD.disdd_G1G2,angleDD.disdd_G1G3,...
     norm(F_T2_on_T12),norm(F_T3_on_T13),...
+    Ldamp12d,Ldamp13d,...
     'File','EOMs/merged_EOM',...
     'Outputs',{'xdd_G1','ydd_G1','th1dd','th2dd','th3dd','phi12dd',...
-    'phi13dd','disdd_G1G2','disdd_G1G3','F12','F13'});
+    'phi13dd','disdd_G1G2','disdd_G1G3','F12','F13','Ldamp12d','Ldamp13d'});
 addpath('EOMs');
 
 %EQUIVALENT BUT DONE PIECE BY PIECE
