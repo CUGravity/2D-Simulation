@@ -24,6 +24,8 @@ syms coil1 coil2 coil3 real;
 syms Lo12 Lo13 real; % rest length of tether
 syms Ldamp12 Ldamp13 real; % length of spring-dashpot attached between tether and end-sats
 syms Ldamp12d Ldamp13d real; % derivative of spring-dashpot
+syms Rdamp_w1 Rdamp_w2 Rdamp_w3 real;
+syms Rdamp_w1d Rdamp_w2d Rdamp_w3d real;
 
 %% Basis vectors
 %Define system axis. Everything at the end is in Cartesian though local
@@ -102,11 +104,20 @@ F_T13_on_T3 = -F_T3_on_T13;
 Ldamp12d = (tension12 - param.lindamp_k*Ldamp12)/param.lindamp_c;
 Ldamp13d = (tension13 - param.lindamp_k*Ldamp13)/param.lindamp_c;
 
+%% Rotational damping torques
+rotdamp_tau_1 = 16*pi^2*param.rotdamp_dyn_vis*param.rotdamp_majorR_1^3*(Rdamp_w1-th1d);
+rotdamp_tau_2 = 16*pi^2*param.rotdamp_dyn_vis*param.rotdamp_majorR_2^3*(Rdamp_w2-th2d);
+rotdamp_tau_3 = 16*pi^2*param.rotdamp_dyn_vis*param.rotdamp_majorR_2^3*(Rdamp_w3-th3d);
 
-%% Torquers
-tau_1 = coil1*k;
-tau_2 = coil2*k;
-tau_3 = coil3*k;
+%% Calculate angular acceleration of damping fluid
+Rdamp_w1d = -8*param.rotdamp_kin_vis/param.rotdamp_minorR_1^2*(Rdamp_w1-th1d);
+Rdamp_w2d = -8*param.rotdamp_kin_vis/param.rotdamp_minorR_2^2*(Rdamp_w2-th2d);
+Rdamp_w3d = -8*param.rotdamp_kin_vis/param.rotdamp_minorR_2^2*(Rdamp_w3-th3d);
+
+%% Torquers (plus the rotational damping torque)
+tau_1 = coil1*k + rotdamp_tau_1;
+tau_2 = coil2*k + rotdamp_tau_2;
+tau_3 = coil3*k + rotdamp_tau_3;
 
 %% AMB of System About G1 - TAKEN OUT B/C IT IS A NULL CASE
 % M_G1 = tau_1 + tau_2 + tau_3;
@@ -179,14 +190,18 @@ matlabFunction(norm(F_T2_on_T12),'File','EOMs/F12_EOM');
 matlabFunction(norm(F_T3_on_T13),'File','EOMs/F13_EOM');
 matlabFunction(Ldamp12d,'File','EOMs/Ldamp12_EOM');
 matlabFunction(Ldamp13d,'File','EOMs/Ldamp13_EOM');
+matlabFunction(Rdamp_w1d,'File','EOMs/Rdamp_w1_EOM');
+matlabFunction(Rdamp_w2d,'File','EOMs/Rdamp_w2_EOM');
+matlabFunction(Rdamp_w3d,'File','EOMs/Rdamp_w2_EOM');
 matlabFunction(angleDD.xdd_G1,angleDD.ydd_G1,angleDD.th1dd,...
     angleDD.th2dd,angleDD.th3dd,angleDD.phi12dd,angleDD.phi13dd,...
     angleDD.disdd_G1G2,angleDD.disdd_G1G3,...
     norm(F_T2_on_T12),norm(F_T3_on_T13),...
-    Ldamp12d,Ldamp13d,...
+    Ldamp12d,Ldamp13d,Rdamp_w1d,Rdamp_w2d,Rdamp_w3d,...
     'File','EOMs/merged_EOM',...
     'Outputs',{'xdd_G1','ydd_G1','th1dd','th2dd','th3dd','phi12dd',...
-    'phi13dd','disdd_G1G2','disdd_G1G3','F12','F13','Ldamp12d','Ldamp13d'});
+    'phi13dd','disdd_G1G2','disdd_G1G3','F12','F13','Ldamp12d','Ldamp13d',...
+    'Rdamp_w1d','Rdamp_w2d','Rdamp_w3d'});
 addpath('EOMs');
 
 %EQUIVALENT BUT DONE PIECE BY PIECE

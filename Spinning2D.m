@@ -24,6 +24,15 @@ param.I_G3 = param.m3*((2*param.d_G3T3)^2+param.d_width^2)/12;
 % properties of linear damper
 param.lindamp_k = 66.667;
 param.lindamp_c = 13.333;
+% properties of the fluid rotational damper
+% the fluid rotational damper is a torus filled with liquid (i.e. a tube wrapped into a loop)
+% the dampers on the end sats can be configured separately from that of the middle sat
+param.rotdamp_dyn_vis = 1e-3; % dynamic viscosity of the fluid
+param.rotdamp_kin_vis = 1e-6; % kinematic viscosity of the fluid
+param.rotdamp_majorR_1 = 0.05; % major axis of the middle-sat torus
+param.rotdamp_minorR_1 = 0.005; % minor axis of the middle-sat torus
+param.rotdamp_majorR_2 = 0.025; % major axis of the end-sat torus
+param.rotdamp_minorR_2 = 0.005; % minor axis of the end-sat torus
 
 if needToGenEOMs
     EOMGenerator(param);
@@ -43,10 +52,10 @@ tic;
 opts = odeset('RelTol',1e-6,'AbsTol',1e-6);
 % x_i = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %       dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3, ...
-%       x1 x1d, y1 y1d, Ldamp12, Ldamp13];
+%       x1 x1d, y1 y1d, Ldamp12 Ldamp13, Rdamp_w1 Rdamp_w2 Rdamp_w3];
 x_i = [0 .5, 0 .5, 0 .5, pi .5, 0 .5, ...
-    4*(2/3/param.tethEA+1)+param.d_G1T12+param.d_G2T2 0 4*(2/3/param.tethEA+1)+param.d_G1T13+param.d_G3T3 0, ...
-    0 0, 0 0, 0, 0];
+    4 0 4 0, ...
+    0 0, 0 0, 0 0, 0 0 0];
 tspan=[0 tf];
 [tarray, zarr] = ode45(@RHS, tspan, x_i, opts, odeP);
 
@@ -81,6 +90,9 @@ y1 = x(17);
 y1d = x(18);
 Ldamp12 = x(19);
 Ldamp13 = x(20);
+Rdamp_w1 = x(21);
+Rdamp_w2 = x(22);
+Rdamp_w3 = x(23);
 
 % define tether rest lengths - these can be configured to change with time
 Lo12 = 4+0.1*heaviside(t-50);
@@ -96,12 +108,12 @@ coil3 = 0;
 
 % set Ldamp12 and Ldamp13 to zero to disable linear damper
 
-[x1dd,y1dd,th1dd,th2dd,th3dd,phi12dd,phi13dd,disdd_G1G2,disdd_G1G3,F12,F13,Ldamp12d,Ldamp13d] = ...
-    merged_EOM(Ldamp12,Ldamp13,Lo12,Lo13,coil1,coil2,coil3,dis_G1G2,dis_G1G3,disd_G1G2,...
-    disd_G1G3,phi12,phi13,phi12d,phi13d,th1,th2,th3);
+[x1dd,y1dd,th1dd,th2dd,th3dd,phi12dd,phi13dd,disdd_G1G2,disdd_G1G3,F12,F13,Ldamp12d,Ldamp13d,Rdamp_w1d,Rdamp_w2d,Rdamp_w3d] = ...
+    merged_EOM(Ldamp12,Ldamp13,Lo12,Lo13,Rdamp_w1,Rdamp_w2,Rdamp_w3,coil1,coil2,coil3,dis_G1G2,dis_G1G3,disd_G1G2,...
+    disd_G1G3,phi12,phi13,phi12d,phi13d,th1,th2,th3,th1d,th2d,th3d);
 
 xdot = [th1d th1dd, th2d th2dd, th3d th3dd, phi12d phi12dd, ...
-    phi13d phi13dd, disd_G1G2 disdd_G1G2 disd_G1G3 disdd_G1G3, x1d x1dd, y1d y1dd, Ldamp12d, Ldamp13d]';
+    phi13d phi13dd, disd_G1G2 disdd_G1G2 disd_G1G3 disdd_G1G3, x1d x1dd, y1d y1dd, Ldamp12d, Ldamp13d, Rdamp_w1d, Rdamp_w2d, Rdamp_w3d]';
 
 end
 

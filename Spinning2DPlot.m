@@ -28,7 +28,7 @@ if down
 end
 
 figure;
-plot(t,z(:,[23 24]));
+plot(t,z(:,[26 27]));
 title('Tether Tension');
 legend('T1 to T2','T1 to T3');
 if down
