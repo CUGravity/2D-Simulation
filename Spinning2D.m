@@ -30,9 +30,9 @@ param.lindamp_c = 13.333;
 param.rotdamp_dyn_vis = 1e-3; % dynamic viscosity of the fluid
 param.rotdamp_kin_vis = 1e-6; % kinematic viscosity of the fluid
 param.rotdamp_majorR_1 = 0.05; % major axis of the middle-sat torus
-param.rotdamp_minorR_1 = 0.005; % minor axis of the middle-sat torus
+param.rotdamp_minorR_1 = 0.003; % minor axis of the middle-sat torus
 param.rotdamp_majorR_2 = 0.025; % major axis of the end-sat torus
-param.rotdamp_minorR_2 = 0.005; % minor axis of the end-sat torus
+param.rotdamp_minorR_2 = 0.003; % minor axis of the end-sat torus
 
 if needToGenEOMs
     EOMGenerator(param);
