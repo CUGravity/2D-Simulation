@@ -36,26 +36,20 @@ if down
 end
 
 figure;
-subplot(3,1,1);
-plot(t/60,z(:,[24]));
-title('Tether Rest Length');
-ylabel('[m]');
+subplot(2,1,1);
+plot(t/60,z(:,[8]));
+title('System Rotation Rates');
+ylabel('[rad/s]');
 xlabel('Time [min]');
-ylim([3.9 4.2]);
+ylim([0 0.2]);
 
-subplot(3,1,2);
-plot(t/60,z(:,[26 27]));
-title('Tether Tension');
-legend('T1 to T2','T1 to T3');
-ylabel('[N]');
-xlabel('Time [min]');
-
-subplot(3,1,3);
+subplot(2,1,2);
 plot(t/60,z(:,[2 4 6]));
 title('Body Rotation Rates');
 legend('Body rate of 1','Body rate of 2','Body rate of 3');
 ylabel('[rad/s]');
 xlabel('Time [min]');
+ylim([0 0.2]);
 
 
 
