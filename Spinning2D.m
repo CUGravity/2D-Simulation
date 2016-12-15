@@ -22,8 +22,8 @@ param.I_G1 = param.m1*((param.d_G1T13+param.d_G1T13)^2+param.d_width^2)/12;
 param.I_G2 = param.m2*((2*param.d_G2T2)^2+param.d_width^2)/12;
 param.I_G3 = param.m3*((2*param.d_G3T3)^2+param.d_width^2)/12;
 % properties of linear damper
-param.lindamp_k = 66.667;
-param.lindamp_c = 13.333;
+param.lindamp_k = 300; % specification range is 250 - 1000
+param.lindamp_c = 20; % specification range is 10 - 100
 % properties of the fluid rotational damper
 % the fluid rotational damper is a torus filled with liquid (i.e. a tube wrapped into a loop)
 % the dampers on the end sats can be configured separately from that of the middle sat
@@ -31,7 +31,7 @@ param.rotdamp_dyn_vis = 1e-3; % dynamic viscosity of the fluid
 param.rotdamp_kin_vis = 1e-6; % kinematic viscosity of the fluid
 param.rotdamp_majorR_1 = 0.05; % major axis of the middle-sat torus
 param.rotdamp_minorR_1 = 0.003; % minor axis of the middle-sat torus
-param.rotdamp_majorR_2 = 0.025; % major axis of the end-sat torus
+param.rotdamp_majorR_2 = 0.05; % major axis of the end-sat torus
 param.rotdamp_minorR_2 = 0.003; % minor axis of the end-sat torus
 
 if needToGenEOMs
