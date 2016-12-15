@@ -2,7 +2,7 @@ function Spinning2DAnimate(t , z, param, timeX, filming, withPlots)
 close all;
 %
 if withPlots
-    Spinning2DPlot(t,z,1);
+    Spinning2DPlot(t,z,param,1);
 end
 %% Coordinate conversion
 % z = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
