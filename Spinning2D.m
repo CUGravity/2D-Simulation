@@ -4,8 +4,8 @@ close all;
 
 param.d_width = 0.1;
 param.d_length1 = 0.2;
-param.d_G2T2 = 0.025;
-param.d_G3T3 = 0.025;
+param.d_G2T2 = 0.05;
+param.d_G3T3 = 0.05;
 % the center sat has a total length of 20cm,
 % but tethers are anchored 5cm from ends
 param.d_G1T12 = 0.05;
@@ -18,7 +18,7 @@ param.tethEA = tethE*tethA;
 param.m1 = 4*(2/3);
 param.m2 = 4*(1/6);
 param.m3 = 4*(1/6);
-param.I_G1 = param.m1*((param.d_G1T13+param.d_G1T13)^2+param.d_width^2)/12;
+param.I_G1 = param.m1*(param.d_length1^2+param.d_width^2)/12;
 param.I_G2 = param.m2*((2*param.d_G2T2)^2+param.d_width^2)/12;
 param.I_G3 = param.m3*((2*param.d_G3T3)^2+param.d_width^2)/12;
 % properties of linear damper
@@ -53,8 +53,8 @@ opts = odeset('RelTol',1e-10,'AbsTol',1e-10);
 % x_i = [th1 th1d, th2 th2d, th3 th3d, phi12 phi12d, phi13 phi13d, ...
 %       dis_G1G2 disd_G1G2 dis_G1G3 disd_G1G3, ...
 %       x1 x1d, y1 y1d, Ldamp12 Ldamp13, Rdamp_w1 Rdamp_w2 Rdamp_w3];
-x_i = [0 .5, 0 .5, 0 .5, pi .5, 0 .5, ...
-    4*(2/3/param.tethEA+1)+param.d_G1T12+param.d_G2T2 0 4*(2/3/param.tethEA+1)+param.d_G1T13+param.d_G3T3 0, ...
+x_i = [0 .1, 0 .1, 0 .1, pi .1, 0 .1, ...
+    1*(2/3/param.tethEA+1)+param.d_G1T12+param.d_G2T2 0 1*(2/3/param.tethEA+1)+param.d_G1T13+param.d_G3T3 0, ...
     0 0, 0 0, 0 0, 0 0 0];
 tspan=[0 tf];
 [tarray, zarr] = ode45(@RHS, tspan, x_i, opts, odeP);
@@ -95,14 +95,14 @@ Rdamp_w2 = x(22);
 Rdamp_w3 = x(23);
 
 % define tether rest lengths - these can be configured to change with time
-Lo12 = 4+0.1*heaviside(t-50);
-Lo13 = 4+0.1*heaviside(t-50);
+Lo12 = 1+0.0*heaviside(t-50);
+Lo13 = 1+0.0*heaviside(t-50);
 
 % wtarget = odeP.wti + t*(odeP.wtf-odeP.wti)/odeP.tfin;
 wtarget = odeP.wti +(odeP.wtf-odeP.wti)/(1+exp(-odeP.kramp*(t-odeP.tmid)));
 
 %[coil1, coil2, coil3] = TorqueController1(x,odeP,wtarget);
-coil1 = 0;%2e-5;
+coil1 = 2.5e-5*heaviside(t-600);%2e-5;
 coil2 = 0;
 coil3 = 0;
 
