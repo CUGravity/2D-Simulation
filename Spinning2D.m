@@ -29,7 +29,7 @@ param.lindamp_c = 20; % specification range is 10 - 100
 % the dampers on the end sats can be configured separately from that of the middle sat
 param.rotdamp_dyn_vis = 1e-3; % dynamic viscosity of the fluid
 param.rotdamp_kin_vis = 1e-6; % kinematic viscosity of the fluid
-param.rotdamp_majorR_1 = 0.05; % major axis of the middle-sat torus
+param.rotdamp_majorR_1 = 0.1; % major axis of the middle-sat torus
 param.rotdamp_minorR_1 = 0.003; % minor axis of the middle-sat torus
 param.rotdamp_majorR_2 = 0.05; % major axis of the end-sat torus
 param.rotdamp_minorR_2 = 0.003; % minor axis of the end-sat torus
@@ -102,7 +102,7 @@ Lo13 = 1+0.0*heaviside(t-50);
 wtarget = odeP.wti +(odeP.wtf-odeP.wti)/(1+exp(-odeP.kramp*(t-odeP.tmid)));
 
 %[coil1, coil2, coil3] = TorqueController1(x,odeP,wtarget);
-coil1 = 2.5e-5*heaviside(t-600);%2e-5;
+coil1 = 2.5e-5*heaviside(t-600)*heaviside(70*60-t);%2e-5;
 coil2 = 0;
 coil3 = 0;
 
